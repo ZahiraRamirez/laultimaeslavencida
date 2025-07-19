@@ -1,60 +1,332 @@
-const materias = [
-  // 1er Año - 1er Cuatrimestre
-  {cod:'2700', nombre:'Economía', correl:[], anio:1, cuatri:1},
-  {cod:'2701', nombre:'Relaciones Públicas I', correl:[], anio:1, cuatri:1},
-  {cod:'2702', nombre:'Filosofía', correl:[], anio:1, cuatri:1},
-  {cod:'2703', nombre:'Sociología', correl:[], anio:1, cuatri:1},
-  {cod:'0901', nombre:'Inglés I', correl:[], anio:1, cuatri:1},
-  {cod:'0911', nombre:'Computación I', correl:[], anio:1, cuatri:1},
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Malla Curricular Interactiva - Lic. Relaciones Públicas</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: #f9f7f6;
+    margin: 1rem;
+    color: #444;
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #3a3a3a;
+  }
+  .malla {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+  }
+  .cuatrimestre {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 6px rgba(0,0,0,0.1);
+    padding: 0.5rem 1rem 1rem;
+    min-width: 220px;
+    flex-shrink: 0;
+  }
+  .cuatrimestre h2 {
+    text-align: center;
+    font-size: 1.2rem;
+    margin-bottom: 0.8rem;
+    color: #6a5d7b;
+  }
+  .materia {
+    background: #d4c7f0;
+    margin: 0.35rem 0;
+    padding: 0.5rem 0.7rem;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background-color 0.3s;
+    color: #3a2c6f;
+  }
+  .materia:hover {
+    background-color: #c3b1e9;
+  }
+  .materia.bloqueada {
+    cursor: default;
+    background-color: #e6e1f7;
+    color: #9a94b8;
+  }
+  .materia.bloqueada:hover {
+    background-color: #e6e1f7;
+  }
+  .materia.aprobada {
+    background-color: #c6f0d1;
+    color: #326732;
+    text-decoration: line-through;
+    font-weight: 600;
+  }
+  .materia.aprobada:hover {
+    background-color: #b7e4c0;
+  }
+  .tooltip {
+    visibility: hidden;
+    background-color: #5a4f7fdd;
+    color: #fff;
+    text-align: left;
+    border-radius: 6px;
+    padding: 5px 8px;
+    position: absolute;
+    z-index: 10;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 180px;
+    font-size: 0.8rem;
+    box-shadow: 0 0 6px rgba(0,0,0,0.15);
+  }
+  .materia.bloqueada:hover .tooltip {
+    visibility: visible;
+  }
+  .nota-input {
+    width: 36px;
+    font-size: 0.85rem;
+    border-radius: 4px;
+    border: 1px solid #999;
+    padding: 1px 4px;
+    margin-left: 8px;
+    text-align: center;
+    background-color: #fff;
+    color: #333;
+  }
+  .flor {
+    font-size: 1.3rem;
+    margin-left: 8px;
+    color: #78b159;
+  }
+</style>
+</head>
+<body>
 
-  // 1er Año - 2do Cuatrimestre
-  {cod:'2704', nombre:'Taller de Integración', correl:[], anio:1, cuatri:2},
-  {cod:'2705', nombre:'Psicología', correl:[], anio:1, cuatri:2},
-  {cod:'2706', nombre:'Teoría Social', correl:[], anio:1, cuatri:2},
-  {cod:'2707', nombre:'Procesos Sociohistóricos Mundiales', correl:[], anio:1, cuatri:2},
-  {cod:'0902', nombre:'Inglés II', correl:['0901'], anio:1, cuatri:2},
-  {cod:'0912', nombre:'Computación II', correl:['0911'], anio:1, cuatri:2},
+<h1>Malla Curricular Lic. Relaciones Públicas</h1>
+<div class="malla" id="malla">
 
-  // 2do Año - 1er Cuatrimestre
-  {cod:'2708', nombre:'Economía Aplicada', correl:['2700'], anio:2, cuatri:3},
-  {cod:'2709', nombre:'Relaciones Públicas II', correl:['2701'], anio:2, cuatri:3},
-  {cod:'2710', nombre:'Teoría de la Comunicación I', correl:['2701'], anio:2, cuatri:3},
-  {cod:'2711', nombre:'Procesos Sociohistóricos Argentinos', correl:['2707'], anio:2, cuatri:3},
-  {cod:'0903', nombre:'Inglés III', correl:['0902'], anio:2, cuatri:3},
+</div>
 
-  // 2do Año - 2do Cuatrimestre
-  {cod:'2712', nombre:'Administración General', correl:['2708'], anio:2, cuatri:4},
-  {cod:'2713', nombre:'Taller de Expresión Corporal', correl:[], anio:2, cuatri:4},
-  {cod:'2753', nombre:'Taller de Juego y Dramatización', correl:[], anio:2, cuatri:4},
-  {cod:'2715', nombre:'Dinámica de Grupo', correl:['2710'], anio:2, cuatri:4},
-  {cod:'2716', nombre:'Teoría de la Comunicación II', correl:['2710'], anio:2, cuatri:4},
-  {cod:'0904', nombre:'Inglés IV', correl:['0903'], anio:2, cuatri:4},
+<script>
+  // Datos de materias: código, nombre, correlativas, cuatrimestre
+  const materias = [
+    {codigo:'2700', nombre:'Economía', correlativas:[], cuatri:1},
+    {codigo:'2701', nombre:'Relaciones Públicas I', correlativas:[], cuatri:1},
+    {codigo:'2702', nombre:'Filosofía', correlativas:[], cuatri:1},
+    {codigo:'2703', nombre:'Sociología', correlativas:[], cuatri:1},
+    {codigo:'2704', nombre:'Taller de Integración', correlativas:[], cuatri:2},
+    {codigo:'2705', nombre:'Psicología', correlativas:[], cuatri:2},
+    {codigo:'2706', nombre:'Teoría Social', correlativas:[], cuatri:2},
+    {codigo:'2707', nombre:'Procesos Sociohistóricos Mundiales', correlativas:[], cuatri:2},
 
-  // 3er Año - 1er Cuatrimestre
-  {cod:'2717', nombre:'Organización y Estructura', correl:['2712'], anio:3, cuatri:5},
-  {cod:'2718', nombre:'Publicidad y Estrategias Comunicacionales', correl:['2709','2710','2711','2712'], anio:3, cuatri:5},
-  {cod:'2719', nombre:'Semiótica', correl:['2716'], anio:3, cuatri:5},
-  {cod:'2720', nombre:'Metodología de la Investigación I', correl:[], anio:3, cuatri:5},
+    {codigo:'2708', nombre:'Economía Aplicada', correlativas:['2700'], cuatri:3},
+    {codigo:'2709', nombre:'Relaciones Públicas II', correlativas:['2701'], cuatri:3},
+    {codigo:'2710', nombre:'Teoría de la Comunicación I', correlativas:['2701'], cuatri:3},
+    {codigo:'2711', nombre:'Procesos Sociohistóricos Argentinos', correlativas:['2707'], cuatri:3},
 
-  // 3er Año - 2do Cuatrimestre
-  {cod:'2721', nombre:'Administración de Recursos Humanos', correl:['2717'], anio:3, cuatri:6},
-  {cod:'2756', nombre:'Comunicación e Imagen Institucional', correl:['2713','2753','2717','2718','2719'], anio:3, cuatri:6},
-  {cod:'2723', nombre:'Psicología Social Institucional', correl:['2715'], anio:3, cuatri:6},
-  {cod:'2724', nombre:'Metodología de la Investigación II', correl:['2704'], anio:3, cuatri:6},
+    {codigo:'2712', nombre:'Administración General', correlativas:['2708'], cuatri:4},
+    {codigo:'2713', nombre:'Taller de Expresión Corporal', correlativas:[], cuatri:4},
+    {codigo:'2753', nombre:'Taller de Juego y Dramatización', correlativas:[], cuatri:4},
+    {codigo:'2715', nombre:'Dinámica de Grupo', correlativas:['2710'], cuatri:4},
+    {codigo:'2716', nombre:'Teoría de la Comunicación II', correlativas:['2710'], cuatri:4},
 
-  // 4to Año - 1er Cuatrimestre
-  {cod:'2725', nombre:'Marketing', correl:['2721','2756','2724'], anio:4, cuatri:7},
-  {cod:'2726', nombre:'Taller de Organización de Eventos', correl:['2723'], anio:4, cuatri:7},
-  {cod:'2755', nombre:'Taller de Elocución y Oratoria', correl:['2723'], anio:4, cuatri:7},
-  {cod:'2728', nombre:'Investigación de Mercado', correl:['2724'], anio:4, cuatri:7},
+    {codigo:'2717', nombre:'Organización y Estructura', correlativas:['2712'], cuatri:5},
+    {codigo:'2718', nombre:'Publicidad y Estrategias Comunicacionales', correlativas:['2709','2710','2711','2712'], cuatri:5},
+    {codigo:'2719', nombre:'Semiótica', correlativas:['2716'], cuatri:5},
+    {codigo:'2720', nombre:'Metodología de la Investigación I', correlativas:[], cuatri:5},
 
-  // 4to Año - 2do Cuatrimestre
-  {cod:'2757', nombre:'Taller de Trabajo Final', correl:['2725','2726','2755','2728'], anio:4, cuatri:8},
-  {cod:'2758', nombre:'Planeamiento de Relaciones Públicas', correl:['2725','2726','2755','2728'], anio:4, cuatri:8},
-  {cod:'2731', nombre:'Seminario de Tópicos de Avanzada', correl:['2725'], anio:4, cuatri:8},
-  {cod:'2732', nombre:'Relaciones Internacionales', correl:['2725'], anio:4, cuatri:8}
-];
+    {codigo:'2721', nombre:'Administración de Recursos Humanos', correlativas:['2717'], cuatri:6},
+    {codigo:'2756', nombre:'Comunicación e Imagen Institucional', correlativas:['2713','2753','2717','2718','2719'], cuatri:6},
+    {codigo:'2723', nombre:'Psicología Social Institucional', correlativas:['2715'], cuatri:6},
+    {codigo:'2724', nombre:'Metodología de la Investigación II', correlativas:['2704'], cuatri:6},
 
+    {codigo:'2725', nombre:'Marketing', correlativas:['2721','2756','2724'], cuatri:7},
+    {codigo:'2726', nombre:'Taller de Organización de Eventos, Ceremonial y Protocolo', correlativas:['2723'], cuatri:7},
+    {codigo:'2755', nombre:'Taller de Elocución y Oratoria', correlativas:['2723'], cuatri:7},
+    {codigo:'2728', nombre:'Investigación de Mercado', correlativas:['2724'], cuatri:7},
+
+    {codigo:'2757', nombre:'Taller de Elaboración del Trabajo Final', correlativas:['2725','2726','2755','2728'], cuatri:8},
+    {codigo:'2758', nombre:'Planeamiento de Relaciones Públicas', correlativas:['2725','2726','2755','2728'], cuatri:8},
+    {codigo:'2731', nombre:'Seminario de Tópicos de Avanzada', correlativas:['2725'], cuatri:8},
+
+    {codigo:'2732', nombre:'Relaciones Internacionales', correlativas:['2725'], cuatri:8},
+
+    {codigo:'0901', nombre:'Inglés I', correlativas:[], cuatri:1},
+    {codigo:'0902', nombre:'Inglés II', correlativas:['0901'], cuatri:2},
+    {codigo:'0903', nombre:'Inglés III', correlativas:['0902'], cuatri:3},
+    {codigo:'0904', nombre:'Inglés IV', correlativas:['0903'], cuatri:4},
+
+    {codigo:'0911', nombre:'Computación I', correlativas:[], cuatri:1},
+    {codigo:'0912', nombre:'Computación II', correlativas:['0911'], cuatri:2},
+  ];
+
+  // LocalStorage keys
+  const LS_KEY = 'mallaRP_aprobadas';
+  const LS_NOTAS_KEY = 'mallaRP_notas';
+
+  // Cargar aprobadas y notas
+  let aprobadas = JSON.parse(localStorage.getItem(LS_KEY)) || {};
+  let notas = JSON.parse(localStorage.getItem(LS_NOTAS_KEY)) || {};
+
+  // Cuatrimestres a mostrar
+  const cuatris = [1,2,3,4,5,6,7,8];
+
+  const mallaEl = document.getElementById('malla');
+
+  // Función para chequear si se cumplen correlativas
+  function desbloqueada(materia){
+    if(materia.correlativas.length === 0) return true;
+    return materia.correlativas.every(cor => aprobadas[cor]);
+  }
+
+  // Crear tooltip con materias faltantes
+  function materiasFaltantes(materia){
+    let faltan = materia.correlativas.filter(cor => !aprobadas[cor]);
+    if(faltan.length === 0) return '';
+    let nombres = faltan.map(cor => {
+      let m = materias.find(x => x.codigo === cor);
+      return m ? m.nombre : cor;
+    });
+    return `Falta aprobar: ${nombres.join(', ')}`;
+  }
+
+  // Crear un elemento materia
+  function crearMateria(materia){
+    const div = document.createElement('div');
+    div.classList.add('materia');
+    div.dataset.codigo = materia.codigo;
+    div.title = '';
+    div.textContent = materia.nombre;
+
+    // Nota input
+    const notaInput = document.createElement('input');
+    notaInput.type = 'number';
+    notaInput.min = 0;
+    notaInput.max = 10;
+    notaInput.placeholder = '--';
+    notaInput.classList.add('nota-input');
+    notaInput.value = notas[materia.codigo] !== undefined ? notas[materia.codigo] : '';
+    notaInput.title = "Ingrese nota (0-10)";
+    notaInput.addEventListener('click', e => e.stopPropagation());
+    notaInput.addEventListener('change', e => {
+      let val = parseFloat(e.target.value);
+      if(isNaN(val) || val < 0 || val > 10){
+        alert('Nota inválida, ingrese un número entre 0 y 10.');
+        e.target.value = notas[materia.codigo] || '';
+        return;
+      }
+      notas[materia.codigo] = val;
+      localStorage.setItem(LS_NOTAS_KEY, JSON.stringify(notas));
+      calcularPromedio();
+    });
+    div.appendChild(notaInput);
+
+    if(desbloqueada(materia)){
+      div.classList.remove('bloqueada');
+      div.title = '';
+      div.style.pointerEvents = 'auto';
+
+      if(aprobadas[materia.codigo]){
+        div.classList.add('aprobada');
+        const flor = document.createElement('span');
+        flor.classList.add('flor');
+        flor.textContent = '🌸';
+        div.appendChild(flor);
+      }
+
+      div.addEventListener('click', () => {
+        if(aprobadas[materia.codigo]){
+          // Desmarcar aprobada
+          delete aprobadas[materia.codigo];
+          delete notas[materia.codigo];
+          localStorage.setItem(LS_KEY, JSON.stringify(aprobadas));
+          localStorage.setItem(LS_NOTAS_KEY, JSON.stringify(notas));
+          renderMalla();
+          calcularPromedio();
+        } else {
+          // Marcar aprobada solo si hay nota válida
+          let notaVal = parseFloat(notaInput.value);
+          if(isNaN(notaVal) || notaVal < 1 || notaVal > 10){
+            alert('Debe ingresar una nota válida entre 1 y 10 para aprobar la materia.');
+            return;
+          }
+          aprobadas[materia.codigo] = true;
+          localStorage.setItem(LS_KEY, JSON.stringify(aprobadas));
+          renderMalla();
+          calcularPromedio();
+        }
+      });
+    } else {
+      div.classList.add('bloqueada');
+      div.style.pointerEvents = 'none';
+      // Tooltip manual para materias bloqueadas
+      const tooltip = document.createElement('div');
+      tooltip.classList.add('tooltip');
+      tooltip.textContent = materiasFaltantes(materia);
+      div.appendChild(tooltip);
+    }
+
+    return div;
+  }
+
+  function renderMalla(){
+    mallaEl.innerHTML = '';
+    cuatris.forEach(c => {
+      const cont = document.createElement('div');
+      cont.classList.add('cuatrimestre');
+      const titulo = document.createElement('h2');
+      titulo.textContent = `Cuatrimestre ${c}`;
+      cont.appendChild(titulo);
+
+      materias.filter(m => m.cuatri === c).forEach(m => {
+        cont.appendChild(crearMateria(m));
+      });
+
+      mallaEl.appendChild(cont);
+    });
+  }
+
+  function calcularPromedio(){
+    let sum = 0;
+    let count = 0;
+    for(let codigo in notas){
+      if(aprobadas[codigo]){
+        let val = parseFloat(notas[codigo]);
+        if(!isNaN(val)){
+          sum += val;
+          count++;
+        }
+      }
+    }
+    const promedio = count ? (sum / count).toFixed(2) : '-';
+    document.getElementById('promedioDisplay').textContent = promedio;
+  }
+
+  // Añadimos área de promedio
+  const promedioDiv = document.createElement('div');
+  promedioDiv.style.textAlign = 'center';
+  promedioDiv.style.margin = '1rem 0';
+  promedioDiv.style.fontSize = '1.1rem';
+  promedioDiv.innerHTML = `Promedio general: <strong id="promedioDisplay">-</strong>`;
+  document.body.insertBefore(promedioDiv, mallaEl);
+
+  // Carga inicial
+  renderMalla();
+  calcularPromedio();
+
+</script>
+</body>
+</html>
+// (el código anterior permanece igual hasta el final del array 'materias')
+    ];
 
     const estado = JSON.parse(localStorage.getItem('estadoMaterias') || '{}');
 
