@@ -1,101 +1,80 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Malla Curricular - Relaciones Públicas</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
-    body {
-      font-family: 'Montserrat', sans-serif;
-      background: #fcfcfc;
-      margin: 0;
-      padding: 1rem;
-      color: #333;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 1rem;
-    }
-    .promedio {
-      text-align: center;
-      margin-bottom: 1.5rem;
-      font-weight: bold;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1rem;
-    }
-    .bloque {
-      background: #fff;
-      border-radius: 10px;
-      padding: 1rem;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
-    }
-    .bloque h2 {
-      text-align: center;
-      font-size: 1rem;
-      margin-bottom: 1rem;
-      color: #444;
-    }
-    .materia {
-      position: relative;
-      border-radius: 8px;
-      padding: 0.5rem;
-      margin-bottom: 0.5rem;
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.85rem;
-      transition: 0.2s ease;
-    }
-    .materia:hover {
-      opacity: 0.95;
-    }
-    .materia.aprobada {
-      text-decoration: line-through;
-      font-weight: bold;
-      background: #fdeff4 !important;
-    }
-    .materia.bloqueada {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    .nota-input {
-      width: 40px;
-      text-align: center;
-      margin-left: 0.5rem;
-      border-radius: 5px;
-      border: 1px solid #aaa;
-    }
-    .tooltip {
-      visibility: hidden;
-      background-color: #333;
-      color: #fff;
-      text-align: center;
-      padding: 4px 8px;
-      border-radius: 6px;
-      position: absolute;
-      z-index: 1;
-      top: 100%;
-      left: 0;
-      font-size: 0.75rem;
-    }
-    .materia.bloqueada:hover .tooltip {
-      visibility: visible;
-    }
-  </style>
-</head>
-<body>
-  <h1>Malla Curricular - Licenciatura en Relaciones Públicas</h1>
-  <div class="promedio">Promedio general: <span id="promedio">-</span></div>
-  <div class="grid" id="malla"></div>
+// (el código anterior permanece igual hasta el final del array 'materias')
+    ];
 
-  <script>
-    const coloresPastel = ['#FFEBEE','#FCE4EC','#E8EAF6','#E3F2FD','#E0F7FA','#E8F5E9','#FFF3E0','#FBE9E7','#EFEBE9','#F9FBE7'];
-    const materias = [/* ACÁ IRÍA EL JSON COMPLETO DE MATERIAS CON CORRELATIVAS */]; // Sigue en la próxima parte
+    const estado = JSON.parse(localStorage.getItem('estadoMaterias') || '{}');
+
+    function cumpleCorrelativas(m) {
+      return m.correl.every(c => estado[c] && estado[c] >= 4);
+    }
+
+    function calcularPromedio() {
+      const notas = Object.values(estado).filter(n => n >= 4);
+      const promedio = notas.length ? (notas.reduce((a,b) => a + b) / notas.length).toFixed(2) : '-';
+      document.getElementById('promedio').textContent = promedio;
+    }
+
+    function render() {
+      const contenedor = document.getElementById('malla');
+      contenedor.innerHTML = '';
+      const grupos = {};
+      materias.forEach(m => {
+        const key = `${m.anio}° Año - ${m.cuatri}° Cuatrimestre`;
+        if (!grupos[key]) grupos[key] = [];
+        grupos[key].push(m);
+      });
+
+      Object.entries(grupos).forEach(([titulo, lista], i) => {
+        const div = document.createElement('div');
+        div.className = 'bloque';
+        div.innerHTML = `<h2>${titulo}</h2>`;
+        lista.forEach(m => {
+          const nota = estado[m.cod] ?? '';
+          const aprobada = nota >= 4;
+          const habilitada = cumpleCorrelativas(m);
+          const materia = document.createElement('div');
+          materia.className = 'materia';
+          if (aprobada) materia.classList.add('aprobada');
+          if (!habilitada && !aprobada) materia.classList.add('bloqueada');
+          materia.style.background = coloresPastel[i % coloresPastel.length];
+
+          const label = document.createElement('span');
+          label.textContent = `${m.nombre}${aprobada ? ' 🌸' : ''}`;
+
+          const input = document.createElement('input');
+          input.className = 'nota-input';
+          input.type = 'number';
+          input.min = 1;
+          input.max = 10;
+          input.value = nota;
+          input.disabled = !habilitada && !aprobada;
+          input.onchange = () => {
+            const val = parseInt(input.value);
+            if (val >= 1 && val <= 10) {
+              estado[m.cod] = val;
+              localStorage.setItem('estadoMaterias', JSON.stringify(estado));
+              render();
+              calcularPromedio();
+            }
+          };
+
+          if (!habilitada && !aprobada) {
+            const tooltip = document.createElement('span');
+            tooltip.className = 'tooltip';
+            tooltip.textContent = 'Faltan: ' + m.correl.map(c => materias.find(x => x.cod === c)?.nombre).join(', ');
+            materia.appendChild(tooltip);
+          }
+
+          materia.appendChild(label);
+          materia.appendChild(input);
+          div.appendChild(materia);
+        });
+        contenedor.appendChild(div);
+      });
+
+      calcularPromedio();
+    }
+
+    render();
   </script>
 </body>
 </html>
