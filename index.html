@@ -166,7 +166,12 @@
 
     {codigo:'0911', nombre:'Computación I', correlativas:[], cuatri:1},
     {codigo:'0912', nombre:'Computación II', correlativas:['0911'], cuatri:2},
-  ];  const estado = JSON.parse(localStorage.getItem('estadoMaterias') || '{}');
+  ];
+
+ 
+    ];
+
+    const estado = JSON.parse(localStorage.getItem('estadoMaterias') || '{}');
 
     function cumpleCorrelativas(m) {
       return m.correl.every(c => estado[c] && estado[c] >= 4);
@@ -219,4 +224,27 @@
               localStorage.setItem('estadoMaterias', JSON.stringify(estado));
               render();
               calcularPromedio();
-           
+            }
+          };
+
+          if (!habilitada && !aprobada) {
+            const tooltip = document.createElement('span');
+            tooltip.className = 'tooltip';
+            tooltip.textContent = 'Faltan: ' + m.correl.map(c => materias.find(x => x.cod === c)?.nombre).join(', ');
+            materia.appendChild(tooltip);
+          }
+
+          materia.appendChild(label);
+          materia.appendChild(input);
+          div.appendChild(materia);
+        });
+        contenedor.appendChild(div);
+      });
+
+      calcularPromedio();
+    }
+
+    render();
+  </script>
+</body>
+</html>
