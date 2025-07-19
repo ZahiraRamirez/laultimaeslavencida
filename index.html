@@ -2,25 +2,25 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Malla Curricular - Zahira</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Malla Curricular - Relaciones Públicas</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
     body {
       font-family: 'Montserrat', sans-serif;
-      background: #f9f7f6;
-      color: #444;
-      margin: 1rem;
+      background: #fcfcfc;
+      margin: 0;
+      padding: 1rem;
+      color: #333;
     }
     h1 {
       text-align: center;
-      color: #333;
       margin-bottom: 1rem;
     }
     .promedio {
       text-align: center;
-      margin-bottom: 1.2rem;
-      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+      font-weight: bold;
     }
     .grid {
       display: grid;
@@ -29,229 +29,73 @@
     }
     .bloque {
       background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 0 6px rgba(0,0,0,0.1);
+      border-radius: 10px;
       padding: 1rem;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
     }
     .bloque h2 {
-      font-size: 1rem;
       text-align: center;
-      color: #6a5d7b;
-      margin-bottom: 0.8rem;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      color: #444;
     }
     .materia {
+      position: relative;
       border-radius: 8px;
       padding: 0.5rem;
       margin-bottom: 0.5rem;
       cursor: pointer;
-      font-size: 0.9rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      position: relative;
-      transition: 0.3s;
+      font-size: 0.85rem;
+      transition: 0.2s ease;
     }
     .materia:hover {
-      opacity: 0.9;
-    }
-    .materia.bloqueada {
-      opacity: 0.4;
-      cursor: default;
+      opacity: 0.95;
     }
     .materia.aprobada {
       text-decoration: line-through;
       font-weight: bold;
+      background: #fdeff4 !important;
+    }
+    .materia.bloqueada {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
     .nota-input {
-      width: 36px;
-      font-size: 0.8rem;
-      margin-left: 8px;
-      border-radius: 4px;
-      border: 1px solid #999;
-      padding: 2px 4px;
+      width: 40px;
       text-align: center;
+      margin-left: 0.5rem;
+      border-radius: 5px;
+      border: 1px solid #aaa;
     }
     .tooltip {
       visibility: hidden;
-      background: #000a;
+      background-color: #333;
       color: #fff;
-      font-size: 0.75rem;
-      padding: 5px 8px;
+      text-align: center;
+      padding: 4px 8px;
       border-radius: 6px;
       position: absolute;
-      top: 110%;
+      z-index: 1;
+      top: 100%;
       left: 0;
-      z-index: 10;
-      width: max-content;
-      max-width: 220px;
+      font-size: 0.75rem;
     }
     .materia.bloqueada:hover .tooltip {
       visibility: visible;
     }
-    .flor {
-      margin-left: 5px;
-      font-size: 1rem;
-    }
   </style>
 </head>
 <body>
-  <h1>Malla Curricular - Lic. en Relaciones Públicas</h1>
-  <div class="promedio">Promedio general: <strong id="promedio">-</strong></div>
+  <h1>Malla Curricular - Licenciatura en Relaciones Públicas</h1>
+  <div class="promedio">Promedio general: <span id="promedio">-</span></div>
   <div class="grid" id="malla"></div>
 
   <script>
-    const colores = ['#fde2e4','#cfe0e8','#f9f9c5','#e6e6fa','#d0f4de','#ffc9de','#fff1c1','#d4f0fc','#ffe3e1','#fce2db'];
-    const LS_KEY = 'malla_aprobadas';
-    const LS_NOTAS_KEY = 'malla_notas';
-
-    const materias = [
-      // año 1
-      {cod:'2700', nombre:'Economía', correl:[], anio:1, cuatri:1},
-      {cod:'2701', nombre:'Relaciones Públicas I', correl:[], anio:1, cuatri:1},
-      {cod:'2702', nombre:'Filosofía', correl:[], anio:1, cuatri:1},
-      {cod:'2703', nombre:'Sociología', correl:[], anio:1, cuatri:1},
-      {cod:'2704', nombre:'Taller de Integración', correl:[], anio:1, cuatri:2},
-      {cod:'2705', nombre:'Psicología', correl:[], anio:1, cuatri:2},
-      {cod:'2706', nombre:'Teoría Social', correl:[], anio:1, cuatri:2},
-      {cod:'2707', nombre:'Procesos Sociohistóricos Mundiales', correl:[], anio:1, cuatri:2},
-      {cod:'0901', nombre:'Inglés I', correl:[], anio:1, cuatri:1},
-      {cod:'0911', nombre:'Computación I', correl:[], anio:1, cuatri:1},
-      {cod:'0902', nombre:'Inglés II', correl:['0901'], anio:1, cuatri:2},
-      {cod:'0912', nombre:'Computación II', correl:['0911'], anio:1, cuatri:2},
-
-      // año 2
-      {cod:'2708', nombre:'Economía Aplicada', correl:['2700'], anio:2, cuatri:3},
-      {cod:'2709', nombre:'Relaciones Públicas II', correl:['2701'], anio:2, cuatri:3},
-      {cod:'2710', nombre:'Teoría de la Comunicación I', correl:['2701'], anio:2, cuatri:3},
-      {cod:'2711', nombre:'Procesos Sociohistóricos Argentinos', correl:['2707'], anio:2, cuatri:3},
-      {cod:'2712', nombre:'Administración General', correl:['2708'], anio:2, cuatri:4},
-      {cod:'2713', nombre:'Taller de Expresión Corporal', correl:[], anio:2, cuatri:4},
-      {cod:'2753', nombre:'Taller de Juego y Dramatización', correl:[], anio:2, cuatri:4},
-      {cod:'2715', nombre:'Dinámica de Grupo', correl:['2710'], anio:2, cuatri:4},
-      {cod:'2716', nombre:'Teoría de la Comunicación II', correl:['2710'], anio:2, cuatri:4},
-      {cod:'0903', nombre:'Inglés III', correl:['0902'], anio:2, cuatri:3},
-      {cod:'0904', nombre:'Inglés IV', correl:['0903'], anio:2, cuatri:4},
-
-      // año 3
-      {cod:'2717', nombre:'Organización y Estructura', correl:['2712'], anio:3, cuatri:5},
-      {cod:'2718', nombre:'Publicidad y Estrategias Comunicacionales', correl:['2709','2710','2711','2712'], anio:3, cuatri:5},
-      {cod:'2719', nombre:'Semiótica', correl:['2716'], anio:3, cuatri:5},
-      {cod:'2720', nombre:'Metodología de la Investigación I', correl:[], anio:3, cuatri:5},
-      {cod:'2721', nombre:'Administración de Recursos Humanos', correl:['2717'], anio:3, cuatri:6},
-      {cod:'2756', nombre:'Comunicación e Imagen Institucional', correl:['2713','2753','2717','2718','2719'], anio:3, cuatri:6},
-      {cod:'2723', nombre:'Psicología Social Institucional', correl:['2715'], anio:3, cuatri:6},
-      {cod:'2724', nombre:'Metodología de la Investigación II', correl:['2704'], anio:3, cuatri:6},
-
-      // año 4
-      {cod:'2725', nombre:'Marketing', correl:['2721','2756','2724'], anio:4, cuatri:7},
-      {cod:'2726', nombre:'Taller de Organización de Eventos', correl:['2723'], anio:4, cuatri:7},
-      {cod:'2755', nombre:'Taller de Elocución y Oratoria', correl:['2723'], anio:4, cuatri:7},
-      {cod:'2728', nombre:'Investigación de Mercado', correl:['2724'], anio:4, cuatri:7},
-      {cod:'2757', nombre:'Taller de Trabajo Final', correl:['2725','2726','2755','2728'], anio:4, cuatri:8},
-      {cod:'2758', nombre:'Planeamiento de Relaciones Públicas', correl:['2725','2726','2755','2728'], anio:4, cuatri:8},
-      {cod:'2731', nombre:'Seminario de Tópicos de Avanzada', correl:['2725'], anio:4, cuatri:8},
-      {cod:'2732', nombre:'Relaciones Internacionales', correl:['2725'], anio:4, cuatri:8},
-    ];
-
-    const aprobadas = JSON.parse(localStorage.getItem(LS_KEY)) || {};
-    const notas = JSON.parse(localStorage.getItem(LS_NOTAS_KEY)) || {};
-    const contenedor = document.getElementById("malla");
-
-    function desbloqueada(m) {
-      return m.correl.every(c => aprobadas[c]);
-    }
-
-    function render() {
-      contenedor.innerHTML = '';
-      for (let a = 1; a <= 4; a++) {
-        for (let c = 1; c <= 2; c++) {
-          const bloque = document.createElement('div');
-          bloque.className = 'bloque';
-          bloque.innerHTML = `<h2>Año ${a} - Cuatr. ${((a-1)*2 + c)}</h2>`;
-          materias.filter(m => m.anio === a && m.cuatri === ((a-1)*2 + c)).forEach(m => {
-            const div = document.createElement('div');
-            div.className = 'materia';
-            div.style.background = colores[Math.floor(Math.random() * colores.length)];
-
-            const desbloq = desbloqueada(m);
-            if (!desbloq) {
-              div.classList.add('bloqueada');
-              const tooltip = document.createElement('div');
-              tooltip.className = 'tooltip';
-              const nombres = m.correl.map(c => {
-                const ref = materias.find(mat => mat.cod === c);
-                return ref ? ref.nombre : c;
-              });
-              tooltip.innerText = 'Falta: ' + nombres.join(', ');
-              div.appendChild(tooltip);
-            }
-
-            if (aprobadas[m.cod]) {
-              div.classList.add('aprobada');
-              div.innerHTML += '🌸';
-            }
-
-            div.insertAdjacentText('afterbegin', m.nombre);
-
-            const input = document.createElement('input');
-            input.className = 'nota-input';
-            input.type = 'number';
-            input.min = 0;
-            input.max = 10;
-            input.value = notas[m.cod] || '';
-            input.title = "Nota 4-10";
-            input.addEventListener('click', e => e.stopPropagation());
-            input.addEventListener('change', () => {
-              let val = parseFloat(input.value);
-              if (isNaN(val) || val < 0 || val > 10) {
-                alert("Nota inválida.");
-                input.value = notas[m.cod] || '';
-              } else {
-                notas[m.cod] = val;
-                localStorage.setItem(LS_NOTAS_KEY, JSON.stringify(notas));
-                calcularPromedio();
-              }
-            });
-
-            div.appendChild(input);
-
-            if (desbloq) {
-              div.addEventListener('click', () => {
-                let notaVal = parseFloat(input.value);
-                if (notaVal >= 4 && notaVal <= 10) {
-                  aprobadas[m.cod] = true;
-                  localStorage.setItem(LS_KEY, JSON.stringify(aprobadas));
-                } else {
-                  alert("Necesitás nota de 4 a 10 para aprobar.");
-                  return;
-                }
-                render();
-                calcularPromedio();
-              });
-            }
-
-            bloque.appendChild(div);
-          });
-          contenedor.appendChild(bloque);
-        }
-      }
-    }
-
-    function calcularPromedio() {
-      let total = 0;
-      let count = 0;
-      for (let cod in aprobadas) {
-        let val = parseFloat(notas[cod]);
-        if (!isNaN(val)) {
-          total += val;
-          count++;
-        }
-      }
-      document.getElementById("promedio").innerText = count ? (total / count).toFixed(2) : '-';
-    }
-
-    render();
-    calcularPromedio();
+    const coloresPastel = ['#FFEBEE','#FCE4EC','#E8EAF6','#E3F2FD','#E0F7FA','#E8F5E9','#FFF3E0','#FBE9E7','#EFEBE9','#F9FBE7'];
+    const materias = [/* ACÁ IRÍA EL JSON COMPLETO DE MATERIAS CON CORRELATIVAS */]; // Sigue en la próxima parte
   </script>
 </body>
 </html>
