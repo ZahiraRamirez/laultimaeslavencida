@@ -50,7 +50,7 @@
       transform: scale(1.02);
     }
     .materia.aprobada {
-      background-color: #ffd1dc;
+      background-color: #ffd6eb;
       text-decoration: line-through;
       color: #a7446e;
     }
@@ -81,35 +81,45 @@
     .nota-input {
       display: block;
       margin-top: 0.5rem;
-      font-size: 0.8rem;
-      width: 100%;
-      padding: 0.3rem;
-      border-radius: 5px;
-      border: 1px solid #ccc;
+      font-size: 0.9rem;
     }
-    #promedio {
+    #promedioBox {
       text-align: center;
-      font-size: 1.2rem;
-      margin-top: 2rem;
       font-weight: bold;
+      margin-top: 2rem;
+      font-size: 1.2rem;
+      background-color: #e6f7ff;
+      padding: 1rem;
+      border-radius: 10px;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
     }
   </style>
 </head>
 <body>
   <h1>Plan de Estudio Lic. en Relaciones Públicas</h1>
   <div id="contenedor"></div>
-  <div id="promedio"></div>
-  <script>
-    const materias = [...]; // se mantiene igual
-    const aprobadas = new Set(JSON.parse(localStorage.getItem("materiasAprobadas") || "[]"));
-    const notas = JSON.parse(localStorage.getItem("notasMaterias") || "{}");
+  <div id="promedioBox"></div>
 
-    function calcularPromedio() {
-      const valores = Object.values(notas).map(n => parseFloat(n)).filter(n => !isNaN(n));
-      if (valores.length === 0) return "Sin notas aún";
-      const promedio = valores.reduce((a, b) => a + b, 0) / valores.length;
-      return `Promedio: ${promedio.toFixed(2)}`;
+  <script>
+    const materias = [...JSON.parse(localStorage.getItem("materiasData") || "[]")];
+    if (!materias.length) {
+      localStorage.setItem("materiasData", JSON.stringify([
+        { codigo: "2700", nombre: "Economía", cuatri: "1A1", correl: [] },
+        { codigo: "2701", nombre: "Relaciones Públicas I", cuatri: "1A1", correl: [] },
+        { codigo: "2702", nombre: "Filosofía", cuatri: "1A1", correl: [] },
+        { codigo: "2703", nombre: "Sociología", cuatri: "1A1", correl: [] },
+        { codigo: "2704", nombre: "Taller de Integración", cuatri: "1A2", correl: [] },
+        { codigo: "2705", nombre: "Psicología", cuatri: "1A2", correl: [] },
+        { codigo: "2706", nombre: "Teoría Social", cuatri: "1A2", correl: [] },
+        { codigo: "2707", nombre: "Procesos Sociohistóricos Mundiales", cuatri: "1A2", correl: [] }
+      ]));
+      location.reload();
     }
+
+    const aprobadas = new Set(JSON.parse(localStorage.getItem("materiasAprobadas") || "[]"));
+    const notas = JSON.parse(localStorage.getItem("materiasNotas") || "{}");
 
     function renderMalla() {
       const contenedor = document.getElementById("contenedor");
@@ -130,48 +140,31 @@
 
         grupos[cuatri].forEach(m => {
           const aprobada = aprobadas.has(m.codigo);
-          const habilitada = cumpleCorrelativas(m);
-
           const div = document.createElement("div");
-          div.className = "materia" + (aprobada ? " aprobada" : habilitada ? "" : " bloqueada");
+          div.className = "materia" + (aprobada ? " aprobada" : "");
           div.textContent = m.nombre;
           div.dataset.codigo = m.codigo;
 
-          if (!habilitada && !aprobada) {
-            const tooltip = document.createElement("div");
-            tooltip.className = "tooltip";
-            tooltip.textContent = "Falta: " + m.correl.filter(c => !aprobadas.has(c)).join(", ");
-            div.appendChild(tooltip);
-          }
-
-          if (habilitada) {
-            div.onclick = () => {
-              if (aprobadas.has(m.codigo)) {
-                aprobadas.delete(m.codigo);
-                delete notas[m.codigo];
-              } else {
-                aprobadas.add(m.codigo);
-              }
-              localStorage.setItem("materiasAprobadas", JSON.stringify([...aprobadas]));
-              localStorage.setItem("notasMaterias", JSON.stringify(notas));
-              renderMalla();
+          div.onclick = () => {
+            const cod = m.codigo;
+            if (aprobadas.has(cod)) {
+              aprobadas.delete(cod);
+              delete notas[cod];
+            } else {
+              aprobadas.add(cod);
+              const nota = prompt("Nota obtenida en " + m.nombre);
+              if (nota && !isNaN(nota)) notas[cod] = parseFloat(nota);
             }
-          }
+            localStorage.setItem("materiasAprobadas", JSON.stringify([...aprobadas]));
+            localStorage.setItem("materiasNotas", JSON.stringify(notas));
+            renderMalla();
+          };
 
-          if (aprobada) {
-            const notaInput = document.createElement("input");
-            notaInput.className = "nota-input";
-            notaInput.type = "number";
-            notaInput.min = 4;
-            notaInput.max = 10;
-            notaInput.placeholder = "Nota";
-            notaInput.value = notas[m.codigo] || "";
-            notaInput.onchange = () => {
-              notas[m.codigo] = notaInput.value;
-              localStorage.setItem("notasMaterias", JSON.stringify(notas));
-              document.getElementById("promedio").textContent = calcularPromedio();
-            };
-            div.appendChild(notaInput);
+          if (aprobada && notas[m.codigo]) {
+            const notaSpan = document.createElement("span");
+            notaSpan.className = "nota-input";
+            notaSpan.textContent = "Nota: " + notas[m.codigo];
+            div.appendChild(notaSpan);
           }
 
           grid.appendChild(div);
@@ -179,7 +172,14 @@
 
         contenedor.appendChild(bloque);
       });
-      document.getElementById("promedio").textContent = calcularPromedio();
+
+      calcularPromedio();
+    }
+
+    function calcularPromedio() {
+      const notasGuardadas = Object.values(notas);
+      const promedio = notasGuardadas.length ? (notasGuardadas.reduce((a,b) => a+b, 0) / notasGuardadas.length).toFixed(2) : "-";
+      document.getElementById("promedioBox").innerText = `Promedio General: ${promedio}`;
     }
 
     renderMalla();
