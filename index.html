@@ -1,5 +1,60 @@
-// (el código anterior permanece igual hasta el final del array 'materias')
-    ];
+const materias = [
+  // 1er Año - 1er Cuatrimestre
+  {cod:'2700', nombre:'Economía', correl:[], anio:1, cuatri:1},
+  {cod:'2701', nombre:'Relaciones Públicas I', correl:[], anio:1, cuatri:1},
+  {cod:'2702', nombre:'Filosofía', correl:[], anio:1, cuatri:1},
+  {cod:'2703', nombre:'Sociología', correl:[], anio:1, cuatri:1},
+  {cod:'0901', nombre:'Inglés I', correl:[], anio:1, cuatri:1},
+  {cod:'0911', nombre:'Computación I', correl:[], anio:1, cuatri:1},
+
+  // 1er Año - 2do Cuatrimestre
+  {cod:'2704', nombre:'Taller de Integración', correl:[], anio:1, cuatri:2},
+  {cod:'2705', nombre:'Psicología', correl:[], anio:1, cuatri:2},
+  {cod:'2706', nombre:'Teoría Social', correl:[], anio:1, cuatri:2},
+  {cod:'2707', nombre:'Procesos Sociohistóricos Mundiales', correl:[], anio:1, cuatri:2},
+  {cod:'0902', nombre:'Inglés II', correl:['0901'], anio:1, cuatri:2},
+  {cod:'0912', nombre:'Computación II', correl:['0911'], anio:1, cuatri:2},
+
+  // 2do Año - 1er Cuatrimestre
+  {cod:'2708', nombre:'Economía Aplicada', correl:['2700'], anio:2, cuatri:3},
+  {cod:'2709', nombre:'Relaciones Públicas II', correl:['2701'], anio:2, cuatri:3},
+  {cod:'2710', nombre:'Teoría de la Comunicación I', correl:['2701'], anio:2, cuatri:3},
+  {cod:'2711', nombre:'Procesos Sociohistóricos Argentinos', correl:['2707'], anio:2, cuatri:3},
+  {cod:'0903', nombre:'Inglés III', correl:['0902'], anio:2, cuatri:3},
+
+  // 2do Año - 2do Cuatrimestre
+  {cod:'2712', nombre:'Administración General', correl:['2708'], anio:2, cuatri:4},
+  {cod:'2713', nombre:'Taller de Expresión Corporal', correl:[], anio:2, cuatri:4},
+  {cod:'2753', nombre:'Taller de Juego y Dramatización', correl:[], anio:2, cuatri:4},
+  {cod:'2715', nombre:'Dinámica de Grupo', correl:['2710'], anio:2, cuatri:4},
+  {cod:'2716', nombre:'Teoría de la Comunicación II', correl:['2710'], anio:2, cuatri:4},
+  {cod:'0904', nombre:'Inglés IV', correl:['0903'], anio:2, cuatri:4},
+
+  // 3er Año - 1er Cuatrimestre
+  {cod:'2717', nombre:'Organización y Estructura', correl:['2712'], anio:3, cuatri:5},
+  {cod:'2718', nombre:'Publicidad y Estrategias Comunicacionales', correl:['2709','2710','2711','2712'], anio:3, cuatri:5},
+  {cod:'2719', nombre:'Semiótica', correl:['2716'], anio:3, cuatri:5},
+  {cod:'2720', nombre:'Metodología de la Investigación I', correl:[], anio:3, cuatri:5},
+
+  // 3er Año - 2do Cuatrimestre
+  {cod:'2721', nombre:'Administración de Recursos Humanos', correl:['2717'], anio:3, cuatri:6},
+  {cod:'2756', nombre:'Comunicación e Imagen Institucional', correl:['2713','2753','2717','2718','2719'], anio:3, cuatri:6},
+  {cod:'2723', nombre:'Psicología Social Institucional', correl:['2715'], anio:3, cuatri:6},
+  {cod:'2724', nombre:'Metodología de la Investigación II', correl:['2704'], anio:3, cuatri:6},
+
+  // 4to Año - 1er Cuatrimestre
+  {cod:'2725', nombre:'Marketing', correl:['2721','2756','2724'], anio:4, cuatri:7},
+  {cod:'2726', nombre:'Taller de Organización de Eventos', correl:['2723'], anio:4, cuatri:7},
+  {cod:'2755', nombre:'Taller de Elocución y Oratoria', correl:['2723'], anio:4, cuatri:7},
+  {cod:'2728', nombre:'Investigación de Mercado', correl:['2724'], anio:4, cuatri:7},
+
+  // 4to Año - 2do Cuatrimestre
+  {cod:'2757', nombre:'Taller de Trabajo Final', correl:['2725','2726','2755','2728'], anio:4, cuatri:8},
+  {cod:'2758', nombre:'Planeamiento de Relaciones Públicas', correl:['2725','2726','2755','2728'], anio:4, cuatri:8},
+  {cod:'2731', nombre:'Seminario de Tópicos de Avanzada', correl:['2725'], anio:4, cuatri:8},
+  {cod:'2732', nombre:'Relaciones Internacionales', correl:['2725'], anio:4, cuatri:8}
+];
+
 
     const estado = JSON.parse(localStorage.getItem('estadoMaterias') || '{}');
 
