@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plan de Estudio Lic. en Relaciones Públicas</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fdfcfa;
+      color: #333;
+      margin: 0;
+      padding: 2rem;
+    }
+    h1 {
+      text-align: center;
+      color: #3e3e3e;
+      font-size: 1.8rem;
+      margin-bottom: 2rem;
+    }
+    .año {
+      margin-bottom: 3rem;
+    }
+    .cuatri {
+      margin-bottom: 1.5rem;
+    }
+    .cuatri h3 {
+      background-color: #f0e6ff;
+      color: #333;
+      padding: 0.5rem;
+      border-radius: 10px;
+    }
+    .grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .materia {
+      flex: 1 1 200px;
+      background: #f6f6f6;
+      border-radius: 10px;
+      padding: 1rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .materia:hover {
+      transform: scale(1.02);
+    }
+    .materia.aprobada {
+      background-color: #fcd6e6;
+      text-decoration: line-through;
+      color: #a7446e;
+    }
+    .materia.bloqueada {
+      background-color: #e8e8e8;
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .tooltip {
+      position: absolute;
+      bottom: 105%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #444;
+      color: #fff;
+      padding: 0.4rem 0.6rem;
+      font-size: 0.7rem;
+      border-radius: 5px;
+      display: none;
+      white-space: nowrap;
+    }
+    .materia.bloqueada:hover .tooltip {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <h1>Plan de Estudio Lic. en Relaciones Públicas</h1>
+  <div id="contenedor"></div>
+
+  <script>
+    const materias = [
+      { codigo: "2700", nombre: "Economía", cuatri: "1A1", correl: [] },
+      { codigo: "2701", nombre: "Relaciones Públicas I", cuatri: "1A1", correl: [] },
+      { codigo: "2702", nombre: "Filosofía", cuatri: "1A1", correl: [] },
+      { codigo: "2703", nombre: "Sociología", cuatri: "1A1", correl: [] },
+      { codigo: "2704", nombre: "Taller de Integración", cuatri: "1A2", correl: [] },
+      { codigo: "2705", nombre: "Psicología", cuatri: "1A2", correl: [] },
+      { codigo: "2706", nombre: "Teoría Social", cuatri: "1A2", correl: [] },
+      { codigo: "2707", nombre: "Procesos Sociohistóricos Mundiales", cuatri: "1A2", correl: [] },
+      { codigo: "2708", nombre: "Economía Aplicada", cuatri: "2A1", correl: ["2700"] },
+      { codigo: "2709", nombre: "Relaciones Públicas II", cuatri: "2A1", correl: ["CEFI"] },
+      { codigo: "2710", nombre: "Teoría de la Comunicación I", cuatri: "2A1", correl: ["CEFI"] },
+      { codigo: "2711", nombre: "Procesos Sociohistóricos Argentinos", cuatri: "2A1", correl: ["CEFI", "2707"] },
+      { codigo: "2712", nombre: "Administración General", cuatri: "2A2", correl: ["CEFI", "2708"] },
+      { codigo: "2713", nombre: "Taller de Expresión Corporal", cuatri: "2A2", correl: ["CEFI"] },
+      { codigo: "2753", nombre: "Taller de Juego y Dramatización", cuatri: "2A2", correl: ["CEFI"] },
+      { codigo: "2715", nombre: "Dinámica de Grupo", cuatri: "2A2", correl: ["CEFI", "2710"] },
+      { codigo: "2716", nombre: "Teoría de la Comunicación II", cuatri: "2A2", correl: ["CEFI", "2710"] },
+      { codigo: "2717", nombre: "Organización y Estructura", cuatri: "3A1", correl: ["FULLCEFI", "2712"] },
+      { codigo: "2718", nombre: "Publicidad y Estrategias Comunicacionales", cuatri: "3A1", correl: ["FULLCEFI", "2709", "2710", "2711", "2712"] },
+      { codigo: "2719", nombre: "Semiótica", cuatri: "3A1", correl: ["FULLCEFI", "2716"] },
+      { codigo: "2720", nombre: "Metodología de la Investigación I", cuatri: "3A1", correl: ["FULLCEFI"] },
+      { codigo: "2721", nombre: "Administración de Recursos Humanos", cuatri: "3A2", correl: ["2717"] },
+      { codigo: "2756", nombre: "Comunicación e Imagen Institucional", cuatri: "3A2", correl: ["2713","2753","2717","2718","2719"] },
+      { codigo: "2723", nombre: "Psicología Social Institucional", cuatri: "3A2", correl: ["2715"] },
+      { codigo: "2724", nombre: "Metodología de la Investigación II", cuatri: "3A2", correl: ["2720"] },
+      { codigo: "2725", nombre: "Marketing", cuatri: "4A1", correl: ["2721","2756","2724"] },
+      { codigo: "2726", nombre: "Taller de Organización de Eventos", cuatri: "4A1", correl: ["2723"] },
+      { codigo: "2755", nombre: "Taller de Elocución y Oratoria", cuatri: "4A1", correl: ["2723"] },
+      { codigo: "2728", nombre: "Investigación de Mercado", cuatri: "4A1", correl: ["2724"] },
+      { codigo: "2757", nombre: "Taller de Elaboración del Trabajo Final", cuatri: "4A2", correl: ["2725","2726","2755","2728"] },
+      { codigo: "2758", nombre: "Planeamiento de Relaciones Públicas", cuatri: "4A2", correl: ["2725","2726","2755","2728"] },
+      { codigo: "2731", nombre: "Seminario de Tópicos de Avanzada", cuatri: "4A2", correl: ["2725"] },
+      { codigo: "2732", nombre: "Relaciones Internacionales", cuatri: "4A2", correl: ["2725"] },
+      { codigo: "0901", nombre: "Inglés I", cuatri: "OPT", correl: [] },
+      { codigo: "0902", nombre: "Inglés II", cuatri: "OPT", correl: ["0901"] },
+      { codigo: "0903", nombre: "Inglés III", cuatri: "OPT", correl: ["0902"] },
+      { codigo: "0904", nombre: "Inglés IV", cuatri: "OPT", correl: ["0903"] },
+      { codigo: "0911", nombre: "Computación I", cuatri: "OPT", correl: [] },
+      { codigo: "0912", nombre: "Computación II", cuatri: "OPT", correl: ["0911"] },
+    ];
+
+    const aprobadas = new Set(JSON.parse(localStorage.getItem("materiasAprobadas") || "[]"));
+
+    function cumpleCorrelativas(m) {
+      if (m.correl.includes("CEFI")) {
+        return cumpleCefiBasico();
+      }
+      if (m.correl.includes("FULLCEFI")) {
+        return cumpleCefiCompleto();
+      }
+      return m.correl.every(c => aprobadas.has(c));
+    }
+
+    function cumpleCefiBasico() {
+      const base = ["2700","2701","2702","2703","2704","2705","2706","2707"];
+      const aprobadasCefi = base.filter(c => aprobadas.has(c));
+      return aprobadasCefi.includes("2701") && aprobadasCefi.includes("2704") && aprobadasCefi.length >= 5;
+    }
+
+    function cumpleCefiCompleto() {
+      const base = ["2700","2701","2702","2703","2704","2705","2706","2707"];
+      return base.every(c => aprobadas.has(c));
+    }
+
+    function renderMalla() {
+      const contenedor = document.getElementById("contenedor");
+      contenedor.innerHTML = "";
+      const grupos = {};
+
+      materias.forEach(m => {
+        if (!grupos[m.cuatri]) grupos[m.cuatri] = [];
+        grupos[m.cuatri].push(m);
+      });
+
+      Object.keys(grupos).sort().forEach(cuatri => {
+        const año = cuatri === "OPT" ? "Optativas" : `${cuatri[0]}° Año - ${cuatri[2]}° Cuatri`;
+        const bloque = document.createElement("div");
+        bloque.className = "año";
+        bloque.innerHTML = `<div class="cuatri"><h3>${año}</h3><div class="grid"></div></div>`;
+        const grid = bloque.querySelector(".grid");
+
+        grupos[cuatri].forEach(m => {
+          const aprobada = aprobadas.has(m.codigo);
+          const habilitada = cumpleCorrelativas(m);
+
+          const div = document.createElement("div");
+          div.className = "materia" + (aprobada ? " aprobada" : habilitada ? "" : " bloqueada");
+          div.textContent = m.nombre;
+          div.dataset.codigo = m.codigo;
+
+          if (!habilitada && !aprobada) {
+            const tooltip = document.createElement("div");
+            tooltip.className = "tooltip";
+            tooltip.textContent = "Falta: " + m.correl.filter(c => !aprobadas.has(c)).join(", ");
+            div.appendChild(tooltip);
+          }
+
+          if (habilitada) {
+            div.onclick = () => {
+              if (aprobadas.has(m.codigo)) {
+                aprobadas.delete(m.codigo);
+              } else {
+                aprobadas.add(m.codigo);
+              }
+              localStorage.setItem("materiasAprobadas", JSON.stringify([...aprobadas]));
+              renderMalla();
+            }
+          }
+
+          grid.appendChild(div);
+        });
+
+        contenedor.appendChild(bloque);
+      });
+    }
+
+    renderMalla();
+  </script>
+</body>
+</html>
